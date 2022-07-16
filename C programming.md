@@ -36,7 +36,7 @@ This is great, but how do we run this now? C is a compiled language, so you are 
 When it comes to programming we often refer to "the compiler" as a whole without going too much into details. Generating an execuitable actually comprises two steps. Creating object files and linking said object files. The compiler is only responsible for creating the object files. Object files are a translation into machine language from our source file. As you all know, computers don't understand english but they work quite well with bits. Once the compiler has produced the object files, we need to invoke the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where do they come from. In the example above we cann the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
 Given that we are working with a somewhat low level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In clang's and gcc's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
 
-`$ clang -S -o code/hello_world-arm.asm code/hello_world.c`
+`$ clang -S -o code/hello_world-arm64.asm code/hello_world.c`
 
 <table>
 <tr>
@@ -50,7 +50,7 @@ Given that we are working with a somewhat low level language, you might want to 
 
 	.section	__TEXT,__text,regular,pure_instructions
 	.build_version macos, 12, 0	sdk_version 12, 3
-	.globl	_main  ; -- Begin function main
+	.globl	_main                           ; -- Begin function main
 	.p2align	2
 _main:                                  ; @main
 	.cfi_startproc
@@ -74,12 +74,13 @@ _main:                                  ; @main
 	add	sp, sp, #48
 	ret
 	.cfi_endproc
-                                ; -- End function
+                                        ; -- End function
 	.section	__TEXT,__cstring,cstring_literals
-l_.str:                         ; @.str
+l_.str:                                 ; @.str
 	.asciz	"Hello World!\n"
 
 .subsections_via_symbols
+
 ```
 
 </td>
@@ -90,7 +91,7 @@ l_.str:                         ; @.str
 
 	.section	__TEXT,__text,regular,pure_instructions
 	.build_version macos, 12, 0	sdk_version 12, 3
-	.globl	_main     ## -- Begin function main
+	.globl	_main                           ## -- Begin function main
 	.p2align	4, 0x90
 _main:                                  ## @main
 	.cfi_startproc
@@ -112,17 +113,138 @@ _main:                                  ## @main
 	popq	%rbp
 	retq
 	.cfi_endproc
-                            ## -- End function
+                                        ## -- End function
 	.section	__TEXT,__cstring,cstring_literals
-L_.str:                     ## @.str
+L_.str:                                 ## @.str
 	.asciz	"Hello World!\n"
 
 .subsections_via_symbols
+
 ```
 
 </td>
 </tr>
 </table>
+
+# Function prototypes
+
+You might have heard the term function prototype as it is a crucial concept to grasp in C. The prototype of a function is the declaration of the function itself, which specifies the function's name and type signature, or return type. A function prototype never contains the body of the function. Why do we need function prototypes? Function prototypes are used to make the compiler aware of our function before we define what the function does. That way, if in our program we reference our function before we define its body, the linker will know what to do with the particular function call since we provided a prototype.
+Here is an example
+
+```c
+// ./code/prototype.c
+
+#include <stdio.h>
+
+int sum(int a, int b);
+
+int main(int argc, char **argv) {
+
+    int sumResult;
+
+    sumResult = sum(10, 5);
+
+    printf("%d\n", sumResult);
+    return 0;
+}
+
+int sum(int a, int b) {
+    return a + b;
+}
+```
+
+# Pointers
+
+Pointers are without a doubt the most common source of confusion when it comes to mastering the art of C programming. So, what is a pointer? What does it do and how do we use it? As the name suggests, a pointer, points. It points to what? It points to an address in memory. Why is that useful? Well, thanks to pointers, we can pass variables by reference rather than by value. It might not be immediate to you now, but this feature alows us to write organised code that performs efficiently and at the same time is easy to ready. How does passing by reference work? Well, we said that pointers point to an address in memory. Typically, that address in memory is where a variable is stored. Therefore, a pointer points to the memory address where a certain variable has been stored. This means that, given we have a reference to said pointer, we can access the value of the variable across different scopes in our program. A scope could be a function. In that regard, the previous statement means that if we define a variable in function A, and then we call function B passing a pointer to the variable, we can change and read the value of the variable from within the scope of function B. If we passed the variable by value we would only be able to ready the value of the variable.
+
+## Passing by value
+
+An exmaple of passing a variable by value would be:
+
+```c
+// ./code/pass_by_value.c
+
+#include <stdio.h>
+
+void print_variable(int variable);
+
+int main(int argc, char **argv) {
+    int mainVariable;
+
+    mainVariable = 10;
+
+    print_variable(mainVariable);
+    return 0;
+}
+
+void print_variable(int variable) {
+    printf("%d\n", variable);
+}
+```
+
+## Passing by reference
+
+Now an example of passing a variable by reference:
+
+```c
+// ./code/pass_by_reference.c
+
+#include <stdio.h>
+
+void print_and_change_variable(int *variable);
+
+int main(int argc, char **argv)
+{
+    int mainVariable;
+
+    mainVariable = 20;
+
+    print_and_change_variable(&mainVariable);
+
+    printf("New value: %d\n", mainVariable);
+    return 0;
+}
+
+void print_and_change_variable(int *variable)
+{
+    printf("%d\n", (*variable));
+    printf("Changing the value\n");
+
+    (*variable) = 15;
+}
+```
+
+There is a lot going on there. So first of all let's learn how to recognise a pointer. Whenever you see the `*` symbol **after** a type definition, then that variable is going to be a pointer. Example:
+
+```c
+int *iAmAPointer;
+```
+
+But a pointer should point to an address right? To get the address where a variable is stored, we use the `&` symbol. Example:
+
+```c
+int dogs;
+int * pDogs;
+
+dogs = 10;
+
+pDogs = &dogs;
+```
+
+Cool, now we want to access the value of the variable from the pointer. To do that, we dereference the pointer. Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? If you see a type definition right before the `*`, then we are declaring a pointer. If you see `*` in front of a variable, with no type definition, then we are dereferencing that variable, and it better be a pointer or you'll be in for trouble. Example:
+
+```c
+int a;
+int *pA; // Declaring a pointer
+int b;
+
+a = 5;
+pA = &a;
+
+b = (*pA); // Dereferencing a pointer
+```
+
+# Add table of memory here
 
 # Strings
 
