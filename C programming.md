@@ -352,12 +352,19 @@ Once we run the program, we can expect something like this:
 It should now be clear that a pointer is just a variable storing the address of another variable. To verify our claims, we can run the program and get a similar output to what I got here:
 ![](assets/memory_output.png)
 
-As you can see, the integers are 4 bytes apart, the pointers are 8 bytes apart and all the sizes check out to what was speculated before. The pointers point to the variables we intended them to point to.
+As you can see, the integers are 4 bytes apart, the pointers are 8 bytes apart and all the sizes check out to what was speculated before. The pointers point to the variables we intended them to point to. Do notice that the pointers are stored subsequently as we speculated. It might be trickier to catch but:
+
+- `pIntegersOne` is stored at `0x16bb8b7c8`
+- `pIntegersZero` is stored at `0x16bb8b7d0`
+- `0x16bb8b7c8` is exaclty 8 bytes "before" `0x16bb8b7d0`
+- In HEX, `0xC8 + 0x08 = 0xD0`
 
 # Strings
 
 So,
+
 ![](assets/strings.jpg)
+
 Or better, we treat strings in a different way from most programming languages. As humans, it's easy to think of a string as a collection of characters
 
 # The most fascinating thing you can do in C
