@@ -1,3 +1,4 @@
 code/*
 !code/*.c
 !code/*asm
+**/*.DS_Store

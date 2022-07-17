@@ -1,4 +1,5 @@
 # Why C?
+
 As electronic engineers or engineers in general, you will likely be working with embedded systems.
 Embedded systems are, for example, your smartphone or your Amazon Alexa, but also your smart light bulb or
 the control system for an oil refinery. As you might be aware, the platform code for your smartphone, that is the user interface and all the frameworks that work behind the scenes so that you can share pictures on
@@ -154,6 +155,7 @@ int sum(int a, int b) {
 Pointers are without a doubt the most common source of confusion when it comes to mastering the art of C programming. So, what is a pointer? What does it do and how do we use it? As the name suggests, a pointer points. It points to what? It points to an address in memory. Why is that useful? Well, thanks to pointers, we can pass variables by reference rather than by value. It might not be immediate to you now, but this feature allows us to write organised code that performs efficiently and at the same time is easy to ready. How does passing by reference work? Well, we said that pointers point to an address in memory. Typically, that address in memory is where a variable is stored. Therefore, a pointer points to the memory address where a certain variable has been stored. This means that, given we have a reference to the said pointer, we can access the value of the variable across different scopes in our program. A scope could be a function. In that regard, the previous statement means that if we define a variable in function A, and then we call function B by passing a pointer to the variable, we can change and read the value of the variable from within the scope of function B. If we passed the variable by value we would only be able to ready the value of the variable.
 
 ## Passing by value
+
 An example of passing a variable by value would be:
 
 ```c
@@ -295,7 +297,62 @@ int main(int argc, char const *argv[])
 
 ```
 
-By analysing the program
+By analysing the program we can predict what's going to happen with our memory.
+
+```c
+// ./code/memory_addresses.c#L1-L10
+
+#include <stdio.h>
+
+#define ARRAY_SIZE 2
+
+int main(int argc, char const *argv[])
+{
+    int integers[ARRAY_SIZE];
+    u_int8_t i;
+    int *pIntegersZero, *pIntegersOne;
+
+```
+
+Here we can see we have four variables. On my machine, integers are 4 bytes wide. Remember that one byte is made of 8 bits. Therefore we can predict the size of `integers` to be 8 bytes or 64 bits. Next, we have the variable `i`. You should notice something odd here. `i` is not just an integer. I used the `u_int8_t` type to define our variable. As the name suggests, this type is 8 bits long. Therefore, our variable `i` is going to be 1 byte long. If you can't tell why I used this smaller integer type, it's because I knew its value would never need to be greater than 255 ($2^8 - 1 = 255$). Hence, we saved some space in memory. This is a very useful concept for embedded systems development, but you should apply it whenever you can. Now we have the two pointers. On my machine, pointers are 8 bytes long or 64 bits.
+
+Notice anything yet? My machine is a 64-bit ARM computer. The fact that pointers are 8 bytes long tells us that my machine can handle 64-bit address spaces. On a 32-bit Intel computer, pointers are usually 4 bytes long as they operate in 32-bit address spaces. So let's rewrite the table with our variables in mind:
+
+| Address (HEX) | Content | Code reference  |
+| ------------- | ------- | --------------- |
+| 0x1000        | Garbage | `pIntegersZero` |
+| 0x1008        | Garbage | `pIntegersOne`  |
+| ...           | ...     | ...             |
+| 0x1100        | Garbage | `integers[0]`   |
+| 0x1104        | Garbage | `integers[1]`   |
+
+Array items are stored consequently in memory. Therefore we can tell for sure that `integers[1]` is going to be stored 4 bytes after `integers[0]` because `integers[0]` itself is going to occupy 4 bytes in memory. Each address usually symbolises one byte, but this is implementation-defined amongst other things such as the size of each type we are using. The same logic applies to our pointers. They are 8 bytes long and they are probably going to be in adjacent addresses. Since there is not a lot else going on in the program, it makes sense for our computer to organise the memory as it is displayed in the table.
+
+The content of all those addresses before we assign a value to those variables is garbage. It's garbage because they store whatever value was in there before we execute our code. It could be nothing, or it could be anything. We don't know and it does not matter to us unless we try to access that memory before assigning some value. If we do that, we do not know what to expect.
+
+```c
+// ./code/memory_addresses.c#L11-L14
+
+integers[0] = 10;
+integers[1] = 20;
+pIntegersZero = &integers[0];
+pIntegersOne = &integers[1];
+```
+
+Once we run the program, we can expect something like this:
+
+| Address (HEX) | Content | Code reference  |
+| ------------- | ------- | --------------- |
+| 0x1000        | 0x1100  | `pIntegersZero` |
+| 0x1008        | 0x1104  | `pIntegersOne`  |
+| ...           | ...     | ...             |
+| 0x1100        | 10      | `integers[0]`   |
+| 0x1104        | 20      | `integers[1]`   |
+
+It should now be clear that a pointer is just a variable storing the address of another variable. To verify our claims, we can run the program and get a similar output to what I got here:
+![](assets/memory_output.png)
+
+As you can see, the integers are 4 bytes apart, the pointers are 8 bytes apart and all the sizes check out to what was speculated before. The pointers point to the variables we intended them to point to.
 
 # Strings
 
