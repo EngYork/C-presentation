@@ -1,20 +1,16 @@
 # Why C?
-
-As electronic engineers, or engineers in general, you will likely be working with embedded system.
+As electronic engineers or engineers in general, you will likely be working with embedded systems.
 Embedded systems are, for example, your smartphone or your Amazon Alexa, but also your smart light bulb or
 the control system for an oil refinery. As you might be aware, the platform code for your smartphone, that is the user interface and all the frameworks that work behind the scenes so that you can share pictures on
-instagram, are most likely written in higher level languages such as Java, Kotlin or Swift. So why is it important for you to know how to prorgam in C? Withouth C, you would not be able to execute code written in those languages. The C language is extensively used in kernel programming. The kernel is the layer that handles all interactions between the operative system and the hardware itself. Another reason why you need
+Instagram, are most likely written in higher-level languages such as Java, Kotlin or Swift. So why is it important for you to know how to program in C? Without C, you would not be able to execute code written in those languages. The C language is extensively used in kernel programming. The kernel is the layer that handles all interactions between the operative system and the hardware itself. Another reason why you need
 to be able to program in C as an engineer is that microcontrollers commonly used in the industry perform best when executing C binaries.
-
 As you learnt last year, you could program the microbit using a python interpreter. However, you should have seen a significant computing and memory performance increase by using the C++ hardware abstraction layer.
-
-# When no to use C
-
-Theoretically you could do everything in C as you have control over the ins and outs of the computer. However, in 2022 you probably don't want to do that for ease of development. If you are developing a desktop application, it would make little sense to use C over a higher language as the complexity of the code would be way higher slowing down the development. The takeaway is, you should learn C but you should also be familiar with Java and friends.
+When not to use C
+Theoretically, you could do everything in C as you have control over the ins and outs of the computer. However, in 2022 you probably don't want to do that for ease of development. If you are developing a desktop application, it would make little sense to use C over a higher language as the complexity of the code would be way higher slowing down the development. The takeaway is that you should learn C but you should also be familiar with Java and friends.
 
 # Hello world
 
-I'm sure most of you will be familiar with the following code but I'll let you all have a quick referesher.
+I'm sure most of you will be familiar with the following code but I'll let you all have a quick refresher.
 
 ```c
 // ./code/hello_world.c
@@ -29,12 +25,12 @@ int main(int argc, char **argv) {
 
 Explain code here
 
-This is great, but how do we run this now? C is a compiled language, so you are going to need a compiler. I would suggest you use either gcc or clang as they are industry standard, but if you are asked by your lecturer to use something else you should probably stick to that or at least verify your code expresses the same behaviour when using their compiler of choice for assessment's sake. Throughout this presentation I will be using clang as it comes bundled with Xcode. And as you can probably tell from this statement, what compiler you use realistically completely depends on what you are working on. Most often than not when developing for embedded system, you will be using cross-compiling toolchains. That is because the architecture of an embedded system is most likely different from the x86 architecture powering your machine. The most common embedded architecture is the ARM architecture but there are alternatives such as RISC-V and the Harvard architecture (most old arduino boards).
+This is great, but how do we run this now? C is a compiled language, so you are going to need a compiler. I would suggest you use either GCC or clang as they are industry standards, but if you are asked by your lecturer to use something else you should probably stick to that or at least verify your code expresses the same behaviour when using their compiler of choice for assessment's sake. Throughout this presentation, I will be using clang as it comes bundled with Xcode. And as you can probably tell from this statement, what compiler you use realistically completely depends on what you are working on. Most often than not when developing for embedded system, you will be using cross-compiling toolchains. That is because the architecture of an embedded system is most likely different from the x86 architecture powering your machine. The most common embedded architecture is the ARM architecture but there are alternatives such as RISC-V and the Harvard architecture (most old Arduino boards).
 
-# What does the copiler do?
+# What does the compiler do?
 
-When it comes to programming we often refer to "the compiler" as a whole without going too much into details. Generating an execuitable actually comprises two steps. Creating object files and linking said object files. The compiler is only responsible for creating the object files. Object files are a translation into machine language from our source file. As you all know, computers don't understand english but they work quite well with bits. Once the compiler has produced the object files, we need to invoke the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where do they come from. In the example above we cann the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
-Given that we are working with a somewhat low level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In clang's and gcc's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
+When it comes to programming we often refer to "the compiler" as a whole without going too much into details. Generating an executable actually comprises two steps. Creating object files and linking said object files. The compiler is only responsible for creating the object files. Object files are a translation into machine language from our source file. As you all know, computers don't understand English but they work quite well with bits. Once the compiler has produced the object files, we need to invoke the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where they come from. In the example above we can the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
+Given that we are working with a somewhat low-level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly, you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In clang's and GCC's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
 
 `$ clang -S -o code/hello_world-arm64.asm code/hello_world.c`
 
@@ -155,11 +151,10 @@ int sum(int a, int b) {
 
 # Pointers
 
-Pointers are without a doubt the most common source of confusion when it comes to mastering the art of C programming. So, what is a pointer? What does it do and how do we use it? As the name suggests, a pointer, points. It points to what? It points to an address in memory. Why is that useful? Well, thanks to pointers, we can pass variables by reference rather than by value. It might not be immediate to you now, but this feature alows us to write organised code that performs efficiently and at the same time is easy to ready. How does passing by reference work? Well, we said that pointers point to an address in memory. Typically, that address in memory is where a variable is stored. Therefore, a pointer points to the memory address where a certain variable has been stored. This means that, given we have a reference to said pointer, we can access the value of the variable across different scopes in our program. A scope could be a function. In that regard, the previous statement means that if we define a variable in function A, and then we call function B passing a pointer to the variable, we can change and read the value of the variable from within the scope of function B. If we passed the variable by value we would only be able to ready the value of the variable.
+Pointers are without a doubt the most common source of confusion when it comes to mastering the art of C programming. So, what is a pointer? What does it do and how do we use it? As the name suggests, a pointer points. It points to what? It points to an address in memory. Why is that useful? Well, thanks to pointers, we can pass variables by reference rather than by value. It might not be immediate to you now, but this feature allows us to write organised code that performs efficiently and at the same time is easy to ready. How does passing by reference work? Well, we said that pointers point to an address in memory. Typically, that address in memory is where a variable is stored. Therefore, a pointer points to the memory address where a certain variable has been stored. This means that, given we have a reference to the said pointer, we can access the value of the variable across different scopes in our program. A scope could be a function. In that regard, the previous statement means that if we define a variable in function A, and then we call function B by passing a pointer to the variable, we can change and read the value of the variable from within the scope of function B. If we passed the variable by value we would only be able to ready the value of the variable.
 
 ## Passing by value
-
-An exmaple of passing a variable by value would be:
+An example of passing a variable by value would be:
 
 ```c
 // ./code/pass_by_value.c
@@ -231,7 +226,7 @@ dogs = 10;
 pDogs = &dogs;
 ```
 
-Cool, now we want to access the value of the variable from the pointer. To do that, we dereference the pointer. Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? If you see a type definition right before the `*`, then we are declaring a pointer. If you see `*` in front of a variable, with no type definition, then we are dereferencing that variable, and it better be a pointer or you'll be in for trouble. Example:
+Cool, now we want to access the value of the variable from the pointer. To do that, we dereference the pointer. Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? If you see a type definition right before the `*`, then we are declaring a pointer. If you see `*` in front of a variable, with no type definition, then we are dereferencing that variable, and it better be a pointer or you'll be in trouble. Example:
 
 ```c
 int a;
@@ -244,7 +239,63 @@ pA = &a;
 b = (*pA); // Dereferencing a pointer
 ```
 
-# Add table of memory here
+It is important to mention that a pointer is a variable itself. Instead of storing a value assigned by us, it stores the address in memory of another variable.
+
+## Example of memory content with variables and pointers
+
+So let's visualise pointers and variables:
+Imagine the below table is the memory in your computer:
+
+| Address (HEX) | Content | Code reference |
+| ------------- | ------- | -------------- |
+| 0x1000        | Garbage | Nothing yet    |
+| ...           | ...     | ...            |
+| 0x1008        | Garbage | Nothing yet    |
+| ...           | ...     | ...            |
+| 0x1100        | Garbage | Nothing yet    |
+| ...           | ...     | ...            |
+| 0x1104        | Garbage | Nothing yet    |
+
+The dots in the table above symbolise all the addresses in between the ones in the table. Okay so now let's consider the following program:
+
+```c
+// ./code/memory_addresses.c
+
+#include <stdio.h>
+
+#define ARRAY_SIZE 2
+
+int main(int argc, char const *argv[])
+{
+    int integers[ARRAY_SIZE];
+    u_int8_t i;
+    int *pIntegersZero, *pIntegersOne;
+
+    integers[0] = 10;
+    integers[1] = 20;
+    pIntegersZero = &integers[0];
+    pIntegersOne = &integers[1];
+
+    for(i = 0; i < ARRAY_SIZE; i++) {
+        printf("Integer at index %u is stored at address %p and has value %d\n", i, &integers[i], integers[i]);
+    }
+
+    printf("The pointer zero stores the address %p and is stored at address %p\n", pIntegersZero, &pIntegersZero);
+    printf("The pointer one stores the address %p and is stored at address %p\n", pIntegersOne, &pIntegersOne);
+
+    printf("\nSizes of variables in the program:\n");
+    printf("integers: %lu bytes\n", sizeof(integers));
+    printf("integers[0]: %lu bytes\n", sizeof(integers[0]));
+    printf("integers[1]: %lu bytes\n", sizeof(integers[1]));
+    printf("pIntegersZero: %lu bytes\n", sizeof(pIntegersZero));
+    printf("pIntegersOne: %lu bytes\n", sizeof(pIntegersOne));
+    printf("i: %lu bytes\n", sizeof(i));
+    return 0;
+}
+
+```
+
+By analysing the program
 
 # Strings
 
@@ -254,4 +305,4 @@ Or better, we treat strings in a different way from most programming languages. 
 
 # The most fascinating thing you can do in C
 
-In my opinion, the most interesting thing you can do in C is memory manipulation. But what is memory? Modern systems have all sorts of memory right? You have storage, you have cache, random access memory (RAM), non volatile random access memory (NVRAM), video random access memory (VRAM) and the list goes on.
+In my opinion, the most interesting thing you can do in C is memory manipulation. But what is memory? Modern systems have all sorts of memory right? You have storage, cache, random access memory (RAM), non-volatile random access memory (NVRAM), video random access memory (VRAM) and the list goes on.
