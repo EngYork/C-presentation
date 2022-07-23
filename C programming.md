@@ -366,6 +366,7 @@ So,
 ![](assets/strings.jpg)
 
 Or better, we treat strings differently from most programming languages. As humans, it's easy to think of a string as a collection of characters. For example, we would normally associate `"Pugs are cute"` with the idea of a string. And that would be true in programming languages like python where we can do stuff like:
+
 ```py
 # ./code/str.py
 
@@ -379,7 +380,9 @@ if __name__ == "__main__":
     main()
 
 ```
+
 or Java:
+
 ```java
 // ./code/Str.java
 
@@ -397,6 +400,7 @@ public class Str {
 ```
 
 But hold on a second, in C you can do this for example:
+
 ```c
 // ./code/dumb_str.c
 
@@ -420,14 +424,58 @@ int main(int argc, char const *argv[])
 ```
 
 So why is this bad? It isn't strictly speaking, but it's not very secure. First of all, as you might have noticed `breed` does not have some kind of string type since there is no string type in C. Strings are arrays of characters. Now, `"Pugs"` is made of `4` characters, yet I specified the length of the character array to be `5`. That is because strings must be "`NULL` terminated" in C. What does that mean? It means that the last character in a character array should have a value of `\0`. Since there is no string type, your machine would have no notion of the length of the character array in use. Therefore, string manipulating functions often rely on the presence of the `NULL` character to determine where the string ends. In essence, a C string is a pointer to the first character in the array. So when you iterate over each item in the array, you know the string ends when you find a character with value `\0`. When a string value is assigned like in the above example, the compiler inserts the `NULL` character for you so you are somewhat safe. But let's say I spelled `"Pugs"` as `"Pugss"`, then we might encounter situations where our program crashes. What you could do to avoid this problem is not to specify the length of the array and the compiler will handle that for you:
+
 ```c
 char breed[] = "Pugs";
 ```
+
 Generally speaking, using any of the above syntaxes is not ideal as they are invalid in ANSI-C. In fact, in ANSI-C variables definitions and declarations should happen at different times in the program. So what would be a better way to work with strings? To find that out, we first need to talk about dynamic memory allocation.
 
 # `malloc()` and friends (dynamic memory allocation)
 
-Everything we have done so far relies on statically allocated variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to come to shine.
+Everything we have done so far relies on statically allocated variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to shine. The main difference between statically and dynamically allocating memory (remember, variables sit in memory) is where and when the allocation happens.
+
+## Static allocation
+
+Statically allocated memory is allocated into the so-called stack, and it's allocated right at the beginning of your program staying allocated until your program exits. The stack is a region of memory allocated to the execution of your program. The size of the stack will not change throughout the execution of the program. Furthermore, once the size of the stack is determined and the memory is allocated, you will not be able to "free" the memory until the program exits. Freeing memory means making it available to other processes. Statically allocated memory is easy to use but gives you very strict constraints.
+
+## Dynamically allocated memory
+
+Dynamically allocated memory is allocated into the so-called heap, and it's allocated upon request from your program. It can be freed whenever your program says it's okay to be freed. It should be clear to you that dynamic allocation gives you incredible degrees of freedom. On the other hand, dynamic allocation is often hard to keep track of and if done incorrectly can quickly lead to memory leaks. As with most things, dynamic allocation is better but harder to use.
+
+So how do we do this dynamic memory allocation thing?
+```c
+// ./code/malloc.c
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NOT_SO_DYNAMIC_LENGTH 10
+
+int main(int argc, char const *argv[])
+{
+    int *dynamicArray;
+    u_int8_t i;
+
+    dynamicArray = malloc(NOT_SO_DYNAMIC_LENGTH * sizeof(int));
+
+    for(i = 0; i < NOT_SO_DYNAMIC_LENGTH; i++) {
+        dynamicArray[i] = NOT_SO_DYNAMIC_LENGTH - i;
+    }
+
+    for (i = 0; i < NOT_SO_DYNAMIC_LENGTH; i++)
+    {
+        printf("Integer at index %u has value %d\n", i, dynamicArray[i]);
+    }
+
+    free(dynamicArray);
+
+    return 0;
+}
+
+```
+
+In the above program we used `malloc()` to dynamically allocate enough memory to store `10 (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `10` times the size of an integer with `sizeof(integer)`. We can do that with every type, although we need to be a bit more careful at times (for example when dealing with strings). At the end of the program, we freed the memory by calling the `free()` function and passing our pointer as argument.
 
 # The most fascinating thing you can do in C
 
