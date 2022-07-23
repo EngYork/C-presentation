@@ -1,4 +1,6 @@
 code/*
 !code/*.c
 !code/*asm
+!code/*.py
+!code/*.java
 **/*.DS_Store

@@ -365,7 +365,69 @@ So,
 
 ![](assets/strings.jpg)
 
-Or better, we treat strings in a different way from most programming languages. As humans, it's easy to think of a string as a collection of characters
+Or better, we treat strings differently from most programming languages. As humans, it's easy to think of a string as a collection of characters. For example, we would normally associate `"Pugs are cute"` with the idea of a string. And that would be true in programming languages like python where we can do stuff like:
+```py
+# ./code/str.py
+
+def main():
+    best_breed = "Pugs"
+    print("The best breed is {}".format(best_breed))
+    return 0
+
+
+if __name__ == "__main__":
+    main()
+
+```
+or Java:
+```java
+// ./code/Str.java
+
+/* This uses Java's "default" package for example purposes only.
+ * NEVER DO THIS!
+ * Reason in short: https://stackoverflow.com/a/7849468
+*/
+
+public class Str {
+    public static void main(String[] args) {
+        String breed = "Pugs";
+        System.out.println(String.format("The best breed is %s", breed));
+    }
+}
+```
+
+But hold on a second, in C you can do this for example:
+```c
+// ./code/dumb_str.c
+
+#include <stdio.h>
+
+#define CHARACTERS 5
+
+int main(int argc, char const *argv[])
+{
+    u_int8_t i;
+    char breed[CHARACTERS] = "Pugs";
+    printf("The best breed is %s\n", breed);
+    for(i = 0; i < CHARACTERS; i++) {
+        if(breed[i] == '\0') {
+            printf("%s is NULL terminated\n", breed);
+        }
+    }
+    return 0;
+}
+
+```
+
+So why is this bad? It isn't strictly speaking, but it's not very secure. First of all, as you might have noticed `breed` does not have some kind of string type since there is no string type in C. Strings are arrays of characters. Now, `"Pugs"` is made of `4` characters, yet I specified the length of the character array to be `5`. That is because strings must be "`NULL` terminated" in C. What does that mean? It means that the last character in a character array should have a value of `\0`. Since there is no string type, your machine would have no notion of the length of the character array in use. Therefore, string manipulating functions often rely on the presence of the `NULL` character to determine where the string ends. In essence, a C string is a pointer to the first character in the array. So when you iterate over each item in the array, you know the string ends when you find a character with value `\0`. When a string value is assigned like in the above example, the compiler inserts the `NULL` character for you so you are somewhat safe. But let's say I spelled `"Pugs"` as `"Pugss"`, then we might encounter situations where our program crashes. What you could do to avoid this problem is not to specify the length of the array and the compiler will handle that for you:
+```c
+char breed[] = "Pugs";
+```
+Generally speaking, using any of the above syntaxes is not ideal as they are invalid in ANSI-C. In fact, in ANSI-C variables definitions and declarations should happen at different times in the program. So what would be a better way to work with strings? To find that out, we first need to talk about dynamic memory allocation.
+
+# `malloc()` and friends (dynamic memory allocation)
+
+Everything we have done so far relies on statically allocated variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to come to shine.
 
 # The most fascinating thing you can do in C
 
