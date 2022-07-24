@@ -475,8 +475,75 @@ int main(int argc, char const *argv[])
 
 ```
 
-In the above program we used `malloc()` to dynamically allocate enough memory to store `10 (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `10` times the size of an integer with `sizeof(integer)`. We can do that with every type, although we need to be a bit more careful at times (for example when dealing with strings). At the end of the program, we freed the memory by calling the `free()` function and passing our pointer as argument.
+In the above program we used `malloc()` to dynamically allocate enough memory to store `10 (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `10` times the size of an integer with `sizeof(integer)`. We can do that with every type. At the end of the program, we freed the memory by calling the `free()` function and passing our pointer as argument. We used dynamic allocation but we did not really take any advantage of it since we used a statically defined size. Let's now take advantage of dynamic allocation:
+```c
+// ./code/memory_operations.c
 
-# The most fascinating thing you can do in C
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-In my opinion, the most interesting thing you can do in C is memory manipulation. But what is memory? Modern systems have all sorts of memory right? You have storage, cache, random access memory (RAM), non-volatile random access memory (NVRAM), video random access memory (VRAM) and the list goes on.
+#define BUFFER_SIZE 256
+
+int bail();
+
+int main(int argc, char const *argv[])
+{
+    char *buffer, *spongebobString;
+    uint8_t i;
+    size_t inputLength, inputSize, newSize;
+
+    inputSize = BUFFER_SIZE * sizeof(char);
+    buffer = malloc(inputSize);
+    // Memory allocation can fail! (Extremely unlikely, but always better safe than sorry)
+    if (buffer != NULL)
+    {
+        printf("Input a string max (%d characters): ", (BUFFER_SIZE - 1));
+        fgets(buffer, BUFFER_SIZE, stdin);
+
+        inputLength = strlen(buffer);
+
+        // Remove new line at end of string
+        inputLength--;
+        buffer[inputLength] = '\0';
+        newSize = ((inputLength + 1) * sizeof(char));
+
+        buffer = realloc(buffer, newSize);
+        spongebobString = malloc(newSize);
+        if (buffer == NULL || spongebobString == NULL)
+            return bail();
+
+        memcpy(spongebobString, buffer, newSize);
+        for (i = 0; i < inputLength; i += 2)
+        {
+            spongebobString[i] = toupper(spongebobString[i]);
+        }
+
+        printf("Input: %s\n", buffer);
+        printf("Output: %s\n\n", spongebobString);
+        printf("Initial size of input: %zu bytes\n", inputSize);
+        printf("New size of input and size of output: %zu bytes\n", newSize);
+
+        free(buffer);
+        free(spongebobString);
+    }
+    else
+    {
+        return bail();
+    }
+
+    return 0;
+}
+
+int bail()
+{
+    printf("It appears this program is being run on a potato, bailing!\n");
+    return -1; // Will "expand" to 255, return code is one byte
+}
+```
+This program takes in an input string with a maximum length of `256` characters (each character is one byte) and returns a Spongebob meme style string (EvErY EvEn ChArAcThEr iS UpPeRcAsE). In this program we use a bunh of new functions.
+ - `fgets` is used to receive input from the user.
+ - `realloc` handles shrinking or expanding previously allocated memory (by `malloc`). It allows us to save some space as we allocate only the memory we actually need to store our string instead of the initial `256` bytes.
+ - `memcpy` copies memory from one address to another. In this case we used it to duplicate our input string into a new buffer that we then modified.
+ - `toupper` converts a character from lower case to uppercase. Can be done in many ways, this is easy and good enough for this example.
