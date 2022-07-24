@@ -547,3 +547,9 @@ This program takes in an input string with a maximum length of `256` characters 
  - `realloc` handles shrinking or expanding previously allocated memory (by `malloc`). It allows us to save some space as we allocate only the memory we actually need to store our string instead of the initial `256` bytes.
  - `memcpy` copies memory from one address to another. In this case we used it to duplicate our input string into a new buffer that we then modified.
  - `toupper` converts a character from lower case to uppercase. Can be done in many ways, this is easy and good enough for this example.
+
+Program output:
+
+![](assets/memory_operations.png)
+
+As you can see, the allocated memory went from the initial `256` bytes to only `27` bytes.
