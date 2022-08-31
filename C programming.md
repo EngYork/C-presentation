@@ -1,17 +1,17 @@
 # Why C?
 
 As electronic engineers or engineers in general, you will likely be working with embedded systems.
-Embedded systems are, for example, your smartphone or your Amazon Alexa, but also your smart light bulb or
-the control system for an oil refinery. As you might be aware, the platform code for your smartphone, that is the user interface and all the frameworks that work behind the scenes so that you can share pictures on
-Instagram, are most likely written in higher-level languages such as Java, Kotlin or Swift. So why is it important for you to know how to program in C? Without C, you would not be able to execute code written in those languages. The C language is extensively used in kernel programming. The kernel is the layer that handles all interactions between the operative system and the hardware itself. Another reason why you need
-to be able to program in C as an engineer is that microcontrollers commonly used in the industry perform best when executing C binaries.
-As you learnt last year, you could program the microbit using a python interpreter. However, you should have seen a significant computing and memory performance increase by using the C++ hardware abstraction layer.
-When not to use C
-Theoretically, you could do everything in C as you have control over the ins and outs of the computer. However, in 2022 you probably don't want to do that for ease of development. If you are developing a desktop application, it would make little sense to use C over a higher language as the complexity of the code would be way higher slowing down the development. The takeaway is that you should learn C but you should also be familiar with Java and friends.
+Embedded systems range from your smartphone to your Alexa, and from your smart light bulb to the control systems for the power grid.
+As you might be aware, the platform code for your smartphone, that is the user interface and all the frameworks that work behind the scenes so that you can share pictures on Instagram, are most likely written in higher-level languages such as Java, Kotlin or Swift. So why is it important for you to know how to program in C? Without C, you would not be able to execute code written in those languages. The C language is extensively used in things like kernel programming (the kernel is the layer that handles all interactions between the operative system and the hardware itself).
+Another reason why you need to be able to program in C as an engineer is that common industrial microcontrollers are best programmed with C due to manufacturer libraries being provided only in C or for performance reasons.
+As you may have learnt last year, you could program the microbit using a python. However, you should have noticed a significant computing and memory performance increase by using the available C++ hardware abstraction layer.
+# Why not C?
+You could, of course, do everything in C as you have control over the ins and outs of the platform. However, you probably don't want to do that for ease of development; If you are developing, say, a mobile app, it often makes little sense to use C over a higher language as the complexity of the code can be much higher which can often increase development time.
+The takeaway from this is that you should learn C but you should also be familiar with newer languages such as C++, C#, Rust, e.t.c.
 
 # Hello world
 
-I'm sure most of you will be familiar with the following code but I'll let you all have a quick refresher.
+I'm sure most of you will be familiar with the following code but for those who aren't, here's a quick refresher:
 
 ```c
 // ./code/hello_world.c
@@ -24,14 +24,21 @@ int main(int argc, char **argv) {
 }
 ```
 
-Explain code here
+- The first statement `#include <stdio.h>` allows us to use the Standard Input/Output library; since C itself does not provide IO functions, instead specifying a set of standard libraries that a platform should supply, we need this library to be able to print to the console.
+- The second statement `int main(int argc, char **argv)` declares our so-called *main* function; most C toolchains expect this function to be the start of our code. The bits inside the brackets are our function *parameters* - in this case they contain the arguments that the user has given to the program on the command line (argv) along with the number of arguments (argc).
+- The third statement `printf("Hello World!\n");` *calls* the library function `printf` with a single parameter, the string-literal **"Hello World!\n"**. This causes **Hello World!** to be printed to the console, along with a new-line (the `\n`).
+- The final statement `return 0;` exits our program. The `0` tells the caller, user, or operating system that our program has not encountered any errors whilst a non-zero number here indicates an error - on certain operating systems such as the BSD systems ([macOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysexits.3.html), [FreeBSD](https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+13.1-RELEASE&arch=default&format=html), OpenBSD, NetBSD) these numbers are standardised in a system library.
 
-This is great, but how do we run this now? C is a compiled language, so you are going to need a compiler. I would suggest you use either GCC or clang as they are industry standards, but if you are asked by your lecturer to use something else you should probably stick to that or at least verify your code expresses the same behaviour when using their compiler of choice for assessment's sake. Throughout this presentation, I will be using clang as it comes bundled with Xcode. And as you can probably tell from this statement, what compiler you use realistically completely depends on what you are working on. Most often than not when developing for embedded system, you will be using cross-compiling toolchains. That is because the architecture of an embedded system is most likely different from the x86 architecture powering your machine. The most common embedded architecture is the ARM architecture but there are alternatives such as RISC-V and the Harvard architecture (most old Arduino boards).
+This is great, but how do we run this now?
+C is a compiled language, so you are going to need a compiler. The usual suspects are GCC and Clang, with most vendors building their own tools off of one of these two. Throughout this presentation I will be using Clang as it comes bundled with Xcode. As you can probably tell from this point, what compiler you use often depends on what platform you are working with. When developing for an embedded system, you will be using cross-compiling toolchains. That is because the architecture and operating system (or lack of) of the embedded target is most likely different from the architecture and OS of your development machine. The most common embedded architecture is the ARM architecture (in Thumb-mode, usually) but there are also common alternatives such as PIC (used in the popular PIC-16 chips), MIPS (used by the PIC-32 range), AVR (used by most Arduinos), PowerPC (used in Automotive, Aerospace, and Defence applications), MSP430 (used in your open-day spinner), e.t.c.
 
 # What does the compiler do?
 
-When it comes to programming we often refer to "the compiler" as a whole without going too much into details. Generating an executable actually comprises two steps. Creating object files and linking said object files. The compiler is only responsible for creating the object files. Object files are a translation into machine language from our source file. As you all know, computers don't understand English but they work quite well with bits. Once the compiler has produced the object files, we need to invoke the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where they come from. In the example above we can the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
-Given that we are working with a somewhat low-level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly, you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In clang's and GCC's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
+When it comes to programming we often refer to "the compiler" as a whole without going too much into details.
+Generating an executable actually comprises at least two steps. Creating object files and then linking the object files. The compiler is only responsible for creating the object files, which are a translation into machine language from our source file.
+As you all know, computers don't understand English but they do work quite well with bits and bytes.
+Once the compiler has produced the object files, we need to call the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where they come from. In the example above we can the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
+Given that we are working with a somewhat low-level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly, you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In Clang and GCC's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
 
 `$ clang -S -o code/hello_world-arm64.asm code/hello_world.c`
 
@@ -125,7 +132,8 @@ L_.str:                                 ## @.str
 
 # Function prototypes
 
-You might have heard the term function prototype as it is a crucial concept to grasp in C. The prototype of a function is the declaration of the function itself, which specifies the function's name and type signature, or return type. A function prototype never contains the body of the function. Why do we need function prototypes? Function prototypes are used to make the compiler aware of our function before we define what the function does. That way, if in our program we reference our function before we define its body, the linker will know what to do with the particular function call since we provided a prototype.
+You might have heard the term function prototype as it is a crucial concept to grasp in C. The prototype of a function is the declaration of the function itself, which specifies the function's name and type signature, or return type. A function prototype never contains the body of the function.
+Why do we need function prototypes? Function prototypes are used to make the compiler aware of our function before we define what the function does. That way, if in our program we reference our function before we define its body, the linker will know what to do with the particular function call since we provided a prototype.
 Here is an example
 
 ```c
@@ -152,7 +160,12 @@ int sum(int a, int b) {
 
 # Pointers
 
-Pointers are without a doubt the most common source of confusion when it comes to mastering the art of C programming. So, what is a pointer? What does it do and how do we use it? As the name suggests, a pointer points. It points to what? It points to an address in memory. Why is that useful? Well, thanks to pointers, we can pass variables by reference rather than by value. It might not be immediate to you now, but this feature allows us to write organised code that performs efficiently and at the same time is easy to ready. How does passing by reference work? Well, we said that pointers point to an address in memory. Typically, that address in memory is where a variable is stored. Therefore, a pointer points to the memory address where a certain variable has been stored. This means that, given we have a reference to the said pointer, we can access the value of the variable across different scopes in our program. A scope could be a function. In that regard, the previous statement means that if we define a variable in function A, and then we call function B by passing a pointer to the variable, we can change and read the value of the variable from within the scope of function B. If we passed the variable by value we would only be able to ready the value of the variable.
+Pointers are, without a doubt, one of the most common sources of confusion when it comes to C programming.
+So, what is a pointer? What does it do and how do we use it?
+As the name suggests, a pointer points; What to? It points to a location, or *address*, in memory.
+Why is that useful? Well, thanks to pointers, we can pass variables *by reference* rather than *by value*. It might not be immediate to you now, but this feature allows us to write code that performs efficiently and at the same time is easy to ready.
+How does passing by reference work? Well like I said, pointers point to a address in memory. Often, but not exclusively, that address is where a variable is stored. This means that, given we have a reference to said variable, we can access it across different **scopes** in our program (A scope could be a function, for instance) without having to make a copy.
+This means that if we define a variable in say, *main*, and then call another function, *B*, by passing a pointer to the variable we can modify (*mutate*) and read the value of the variable from within that function B. If we passed the variable by value we would only be able to see the value of the variable without being able to mutate it.
 
 ## Passing by value
 
