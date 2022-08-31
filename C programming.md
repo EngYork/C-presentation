@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 - The final statement `return 0;` exits our program. The `0` tells the caller, user, or operating system that our program has not encountered any errors whilst a non-zero number here indicates an error - on certain operating systems such as the BSD systems ([macOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysexits.3.html), [FreeBSD](https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+13.1-RELEASE&arch=default&format=html), OpenBSD, NetBSD) these numbers are standardised in a system library.
 
 This is great, but how do we run this now?
-C is a compiled language, so you are going to need a compiler. The usual suspects are GCC and Clang, with most vendors building their own tools off of one of these two. Throughout this presentation I will be using Clang as it comes bundled with Xcode. As you can probably tell from this point, what compiler you use often depends on what platform you are working with. When developing for an embedded system, you will be using cross-compiling toolchains. That is because the architecture and operating system (or lack of) of the embedded target is most likely different from the architecture and OS of your development machine. The most common embedded architecture is the ARM architecture (in Thumb-mode, usually) but there are also common alternatives such as PIC (used in the popular PIC-16 chips), MIPS (used by the PIC-32 range), AVR (used by most Arduinos), PowerPC (used in Automotive, Aerospace, and Defence applications), MSP430 (used in your open-day spinner), e.t.c.
+C is a compiled language, so you are going to need a compiler. The usual suspects are GCC and Clang, with most vendors building their own tools off of one of these two. Throughout this presentation I will be using Clang as it comes bundled with Xcode. As you can probably tell from this point, what compiler you use often depends on what platform you are working with. When developing for an embedded system, you will be using cross-compiling toolchains. That is because the architecture and operating system (or lack of) of the embedded target is most likely different from the architecture and OS of your development machine. The most common embedded architecture is the ARM architecture (in Thumb-mode, usually) but there are also common alternatives such as PIC (used in the popular PIC-16 chips), MIPS (used in the PIC-32 range), AVR (used by most Arduinos), PowerPC (used in Automotive, Aerospace, and Defence applications), MSP430 (used in your open-day spinner), e.t.c.
 
 # What does the compiler do?
 
@@ -224,37 +224,54 @@ void print_and_change_variable(int *variable)
 }
 ```
 
-There is a lot going on there. So first of all let's learn how to recognise a pointer. Whenever you see the `*` symbol **after** a type definition, then that variable is going to be a pointer. Example:
+There is a lot going on there. So first of all let's learn how to recognise a pointer. Whenever you see the `*` symbol **after** a type definition, then that variable is going to contain a pointer, rather than a value. Example:
 
 ```c
-int *iAmAPointer;
+int *iAmAPointer = NULL;
 ```
+iAmAPointer is going to be a pointer to an Integer value, though it currently points at the `NULL` address.
 
-But a pointer should point to an address right? To get the address where a variable is stored, we use the `&` symbol. Example:
+
+But a pointer should point to something - it shouldn't be `NULL`. To get the address of a variable to give to a pointer-variable, we use the `&` symbol. Example:
 
 ```c
-int dogs;
-int * pDogs;
+int iAmAValue;
+int * iAmAPointer;
 
-dogs = 10;
+iAmAValue = 10;
 
-pDogs = &dogs;
+iAmAPointer = &iAmAValue;
 ```
 
-Cool, now we want to access the value of the variable from the pointer. To do that, we dereference the pointer. Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? If you see a type definition right before the `*`, then we are declaring a pointer. If you see `*` in front of a variable, with no type definition, then we are dereferencing that variable, and it better be a pointer or you'll be in trouble. Example:
+Now we want to access the value of the variable from the pointer. To do that, we *dereference* the pointer.
+Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? Context. If you see a type (int, float, char, e.t.c.) right before the `*`, then we are declaring a pointer to a variable of that type. If you see `*` in front of a variable (such as `*iAmAPointer`), then we are dereferencing that variable as a pointer - and it better be a valid pointer or there'll be trouble! Example:
 
 ```c
-int a;
-int *pA; // Declaring a pointer
-int b;
+int iAmAValue;
+int iAmTheSameValue;
+int * iAmAPointer;
 
-a = 5;
-pA = &a;
+iAmAValue = 10;
 
-b = (*pA); // Dereferencing a pointer
+iAmAPointer = &iAmAValue;
+
+iAmTheSameValue = (*iAmAPointer); /* Dereference the pointer */
 ```
 
-It is important to mention that a pointer is a variable itself. Instead of storing a value assigned by us, it stores the address in memory of another variable.
+```c
+int iAmAValue;
+int iAmTheSameValue;
+int * iAmAPointer;
+
+iAmAValue = 10;
+
+iAmAPointer = &iAmAValue;
+
+iAmTheSameValue = (*iAmAValue); /* error: invalid type argument of unary ‘*’ (have ‘int’) */
+```
+
+
+It is important to mention that a pointer is just a variable, except instead of storing a "human" value it stores another variable's memory address.
 
 ## Example of memory content with variables and pointers
 
@@ -271,19 +288,22 @@ Imagine the below table is the memory in your computer:
 | ...           | ...     | ...            |
 | 0x1104        | Garbage | Nothing yet    |
 
-The dots in the table above symbolise all the addresses in between the ones in the table. Okay so now let's consider the following program:
+The dots in the table above symbolise all the addresses in between the ones in the table.
+
+Let's now consider the following program:
 
 ```c
 // ./code/memory_addresses.c
 
 #include <stdio.h>
+#include <stdint.h>
 
 #define ARRAY_SIZE 2
 
 int main(int argc, char const *argv[])
 {
     int integers[ARRAY_SIZE];
-    u_int8_t i;
+    uint8_t i;
     int *pIntegersZero, *pIntegersOne;
 
     integers[0] = 10;
@@ -316,18 +336,21 @@ By analysing the program we can predict what's going to happen with our memory.
 // ./code/memory_addresses.c#L1-L10
 
 #include <stdio.h>
+#include <stdint.h>
 
 #define ARRAY_SIZE 2
 
 int main(int argc, char const *argv[])
 {
     int integers[ARRAY_SIZE];
-    u_int8_t i;
+    uint8_t i;
     int *pIntegersZero, *pIntegersOne;
 
 ```
 
-Here we can see we have four variables. On my machine, integers are 4 bytes wide. Remember that one byte is made of 8 bits. Therefore we can predict the size of `integers` to be 8 bytes or 64 bits. Next, we have the variable `i`. You should notice something odd here. `i` is not just an integer. I used the `u_int8_t` type to define our variable. As the name suggests, this type is 8 bits long. Therefore, our variable `i` is going to be 1 byte long. If you can't tell why I used this smaller integer type, it's because I knew its value would never need to be greater than 255 ($2^8 - 1 = 255$). Hence, we saved some space in memory. This is a very useful concept for embedded systems development, but you should apply it whenever you can. Now we have the two pointers. On my machine, pointers are 8 bytes long or 64 bits.
+Here we can see we have four variables. On most [modern non-embedded platforms](https://www.freebsd.org/cgi/man.cgi?query=arch&manpath=FreeBSD+12-current), integers are 4 bytes wide (Remember also that one byte is made of 8 bits). Next, we have the variable `i`. You should notice something odd here. `i` is not just an integer. I used the `uint8_t` type to define our variable, which as the name suggests is 8 bits, or 1 byte, long. I used this explicitly-sized type it's because I knew its value would never need to be greater than 255 ($2^8 - 1 = 255$). Hence, we saved some space in memory. This can certainly be a useful concept for embedded systems development.
+
+Now we have two pointers. On a 64-bit platform pointers are usually 8 bytes long (or 64 bits).
 
 Notice anything yet? My machine is a 64-bit ARM computer. The fact that pointers are 8 bytes long tells us that my machine can handle 64-bit address spaces. On a 32-bit Intel computer, pointers are usually 4 bytes long as they operate in 32-bit address spaces. So let's rewrite the table with our variables in mind:
 
@@ -339,9 +362,9 @@ Notice anything yet? My machine is a 64-bit ARM computer. The fact that pointers
 | 0x1100        | Garbage | `integers[0]`   |
 | 0x1104        | Garbage | `integers[1]`   |
 
-Array items are stored consequently in memory. Therefore we can tell for sure that `integers[1]` is going to be stored 4 bytes after `integers[0]` because `integers[0]` itself is going to occupy 4 bytes in memory. Each address usually symbolises one byte, but this is implementation-defined amongst other things such as the size of each type we are using. The same logic applies to our pointers. They are 8 bytes long and they are probably going to be in adjacent addresses. Since there is not a lot else going on in the program, it makes sense for our computer to organise the memory as it is displayed in the table.
+Array items are stored consequently in memory. Therefore we can tell for sure that `integers[1]` is going to be stored 4 bytes after `integers[0]` because `integers[0]` itself is going to occupy 4 bytes in memory. Each address usually symbolises one byte, but this is implementation-defined and can, amongst other things, depend on the size of each type we are using. The same logic applies to our pointers. They are 8 bytes long and they are probably going to be in adjacent addresses. Since there is not a lot else going on in the program, it makes sense for our computer to organise the memory as it is displayed in the table.
 
-The content of all those addresses before we assign a value to those variables is garbage. It's garbage because they store whatever value was in there before we execute our code. It could be nothing, or it could be anything. We don't know and it does not matter to us unless we try to access that memory before assigning some value. If we do that, we do not know what to expect.
+The content of all those addresses before we assign a value to those variables is unknown and probably rubbish. It's rubbish because they store whatever value was in there before we execute our code. It could be nothing, or it could be anything. We don't know and it generally does not matter to us unless we try to access that memory before assigning some value. If we do that, we can't know what to expect.
 
 ```c
 // ./code/memory_addresses.c#L11-L14
@@ -378,7 +401,7 @@ So,
 
 ![](assets/strings.jpg)
 
-Or better, we treat strings differently from most programming languages. As humans, it's easy to think of a string as a collection of characters. For example, we would normally associate `"Pugs are cute"` with the idea of a string. And that would be true in programming languages like python where we can do stuff like:
+Or better, we treat strings differently from most programming languages. As humans, it's easy to think of a string as a collection of characters. For example, we would normally associate `"Pugs are cute"` with the idea of a string. And that would be true in programming languages like Python where we can do stuff like:
 
 ```py
 # ./code/str.py
@@ -436,27 +459,28 @@ int main(int argc, char const *argv[])
 
 ```
 
-So why is this bad? It isn't strictly speaking, but it's not very secure. First of all, as you might have noticed `breed` does not have some kind of string type since there is no string type in C. Strings are arrays of characters. Now, `"Pugs"` is made of `4` characters, yet I specified the length of the character array to be `5`. That is because strings must be "`NULL` terminated" in C. What does that mean? It means that the last character in a character array should have a value of `\0`. Since there is no string type, your machine would have no notion of the length of the character array in use. Therefore, string manipulating functions often rely on the presence of the `NULL` character to determine where the string ends. In essence, a C string is a pointer to the first character in the array. So when you iterate over each item in the array, you know the string ends when you find a character with value `\0`. When a string value is assigned like in the above example, the compiler inserts the `NULL` character for you so you are somewhat safe. But let's say I spelled `"Pugs"` as `"Pugss"`, then we might encounter situations where our program crashes. What you could do to avoid this problem is not to specify the length of the array and the compiler will handle that for you:
+So why is this bad? It isn't strictly speaking, but it's not very secure. First of all, as you might have noticed `breed` does not have some kind of string type since there is no string type in C. Strings are arrays of characters. Now, `"Pugs"` is made of `4` characters, yet I specified the length of the character array to be `5`. That is because strings must be "`NULL` terminated" in C. What does that mean? It means that the last character in a character array should have a value of `\0`.
+Since there is no string type, your machine would have no notion of the length of the character array in use. Therefore, string manipulating functions often rely on the presence of the `NULL` character to determine where the string ends. In essence, a C string is a pointer to the first character in the array. So when you iterate over each item in the array, you know the string ends when you find a character with value `\0`. When a string value is assigned like in the above example, the compiler inserts the `NULL` character for you so you are somewhat safe. But let's say I spelled `"Pugs"` as `"Pugss"`, then we might encounter situations where our program crashes. What you could do to avoid this problem is not to specify the length of the array and the compiler will handle that for you:
 
 ```c
-char breed[] = "Pugs";
+char* breed = "Pugs";
 ```
 
-Generally speaking, using any of the above syntaxes is not ideal as they are invalid in ANSI-C. In fact, in ANSI-C variables definitions and declarations should happen at different times in the program. So what would be a better way to work with strings? To find that out, we first need to talk about dynamic memory allocation.
+Generally speaking, using any of the above syntaxes is not ideal as they are invalid in ISO-C. In fact, in ISO-C variables, definitions, and declarations should happen at different times in the program. So what would be a better way to work with strings? To find that out, we first need to talk about dynamic memory allocation.
 
 # `malloc()` and friends (dynamic memory allocation)
 
-Everything we have done so far relies on statically allocated variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to shine. The main difference between statically and dynamically allocating memory (remember, variables sit in memory) is where and when the allocation happens.
+Everything we have done so far relies on *statically allocated* variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to shine. The main difference between *statically* and *dynamically* allocated memory (remember, variables sit in memory) is where and when the allocation happens.
 
 ## Static allocation
 
-Statically allocated memory is allocated into the so-called stack, and it's allocated right at the beginning of your program staying allocated until your program exits. The stack is a region of memory allocated to the execution of your program. The size of the stack will not change throughout the execution of the program. Furthermore, once the size of the stack is determined and the memory is allocated, you will not be able to "free" the memory until the program exits. Freeing memory means making it available to other processes. Statically allocated memory is easy to use but gives you very strict constraints.
+Statically allocated memory is allocated in what is called the *stack*, and it's allocated right at the beginning of your program staying allocated until your program exits. The stack is a region of memory allocated to the execution of your program. The ammount of memory available to the stack will not change throughout the execution of the program; Furthermore, once the size of the stack is determined and the memory is allocated, you will not be able to "free" the memory until the program exits. Freeing memory means making it available to other processes. Statically allocated memory is easy to use but gives you rather strict constraints.
 
 ## Dynamically allocated memory
 
 Dynamically allocated memory is allocated into the so-called heap, and it's allocated upon request from your program. It can be freed whenever your program says it's okay to be freed. It should be clear to you that dynamic allocation gives you incredible degrees of freedom. On the other hand, dynamic allocation is often hard to keep track of and if done incorrectly can quickly lead to memory leaks. As with most things, dynamic allocation is better but harder to use.
 
-So how do we do this dynamic memory allocation thing?
+So - how do we do this dynamic memory allocation thing?
 ```c
 // ./code/malloc.c
 
@@ -488,7 +512,7 @@ int main(int argc, char const *argv[])
 
 ```
 
-In the above program we used `malloc()` to dynamically allocate enough memory to store `10 (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `10` times the size of an integer with `sizeof(integer)`. We can do that with every type. At the end of the program, we freed the memory by calling the `free()` function and passing our pointer as argument. We used dynamic allocation but we did not really take any advantage of it since we used a statically defined size. Let's now take advantage of dynamic allocation:
+In the above program we used the `malloc()` function from the Standard Library to dynamically allocate enough memory to store `10 * (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `NOT_SO_DYNAMIC_LENGTH` (10, here) times the size of an integer (`sizeof(integer)`). We can do that with every type. At the end of the program, we released (or *freed*) the memory by calling the `free()` function and passing our pointer as a parameter. We used dynamic allocation but we did not really take any advantage of it, since we used a statically defined size. Let's now take advantage of dynamic allocation:
 ```c
 // ./code/memory_operations.c
 
