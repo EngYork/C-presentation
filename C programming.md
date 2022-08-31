@@ -9,7 +9,7 @@ Another reason why you need to be able to program in C as an engineer is that co
 As you may have learnt last year, you could program the microbit using a python. However, you should have noticed a significant computing and memory performance increase by using the available C++ hardware abstraction layer.
 # Why not C?
 You could, of course, do everything in C as you have control over the ins and outs of the platform. However, you probably don't want to do that for ease of development; If you are developing, say, a mobile app, it often makes little sense to use C over a higher language as the complexity of the code can be much higher which can often increase development time.
-The takeaway from this is that you should learn C but you should also be familiar with newer languages such as C++, C#, Rust, e.t.c.
+The takeaway from this is that you should learn C but you should also be familiar with newer languages such as C++, Java, e.t.c.
 
 # Hello world
 
