@@ -6,10 +6,12 @@ Embedded systems range from your smartphone to your Alexa, and from your smart l
 As you might be aware, the top-level platform code for your smartphone, that is the user interface and all the frameworks that work behind the scenes so that you can share pictures on Instagram, are most likely written in higher-level languages such as Java, Kotlin or Swift. So why is it important for you to know how to program in C? Without C, you would not be able to execute code written in those languages. The C language is extensively used in things like kernel programming (the kernel is the layer that handles all interactions between the operative system and the hardware itself).
 
 Another reason why you need to be able to program in C as an engineer is that common industrial microcontrollers are best programmed with C due to manufacturer libraries being provided only in C or for performance reasons.
-As you may have learnt last year, you could program the microbit using a python. However, you should have noticed a significant computing and memory performance increase by using the available C++ hardware abstraction layer.
+As you may have learnt last year, you could program the microbit using python. However, you should have noticed a significant computing and memory performance increase by using the available C++ hardware abstraction layer.
+
 # Why not C?
+
 You could, of course, do everything in C as you have control over the ins and outs of the platform. However, you probably don't want to do that for ease of development; If you are developing, say, a mobile app, it often makes little sense to use C over a higher language as the complexity of the code can be much higher which can often increase development time.
-The takeaway from this is that you should learn C but you should also be familiar with newer languages such as C++, Java, e.t.c.
+The takeaway from this is that you should learn C but you should also be familiar with newer languages such as C++, Java, etc.
 
 # Hello world
 
@@ -27,22 +29,21 @@ int main(int argc, char **argv) {
 ```
 
 - The first statement `#include <stdio.h>` allows us to use the Standard Input/Output library; since C itself does not provide IO functions, instead specifying a set of standard libraries that a platform should supply, we need this library to be able to print to the console.
-- The second statement `int main(int argc, char **argv)` declares our so-called *main* function; most C toolchains expect this function to be the start of our code. The bits inside the brackets are our function *parameters* - in this case they contain the arguments that the user has given to the program on the command line (argv) along with the number of arguments (argc).
-- The third statement `printf("Hello World!\n");` *calls* the library function `printf` with a single parameter, the string-literal **"Hello World!\n"**. This causes **Hello World!** to be printed to the console, along with a new-line (the `\n`).
+- The second statement `int main(int argc, char **argv)` declares our so-called _main_ function; most C toolchains expect this function to be the start of our code. The bits inside the brackets are our function _parameters_ - in this case they contain the arguments that the user has given to the program on the command line (argv) along with the number of arguments (argc).
+- The third statement `printf("Hello World!\n");` _calls_ the library function `printf` with a single parameter, the string-literal **"Hello World!\n"**. This causes **Hello World!** to be printed to the console, along with a new-line (the `\n`).
 - The final statement `return 0;` exits our program. The `0` tells the caller, user, or operating system that our program has not encountered any errors whilst a non-zero number here indicates an error - on certain operating systems such as the BSD systems ([macOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysexits.3.html), [FreeBSD](https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+13.1-RELEASE&arch=default&format=html), OpenBSD, NetBSD) these numbers are standardised in a system library.
 
 This is great, but how do we run this now?
 
 C is a compiled language, so you are going to need a compiler. The usual suspects are GCC and Clang, with most vendors building their own tools off of one of these two. Throughout this presentation I will be using Clang as it comes bundled with Xcode. As you can probably tell from this point, what compiler you use often depends on what platform you are working with. When developing for an embedded system, you will be using cross-compiling toolchains. That is because the architecture and operating system (or lack of) of the embedded target is most likely different from the architecture and OS of your development machine.
 
-The most common embedded architecture is the ARM architecture (in Thumb-mode, usually) but there are also common alternatives such as PIC (used in the popular PIC-16 chips), MIPS (used in the PIC-32 range), AVR (used by most Arduinos), PowerPC (used in Automotive, Aerospace, and Defence applications), MSP430 (used in your open-day spinner), e.t.c.
+The most common embedded architecture is the ARM architecture (in Thumb-mode, usually) but there are also common alternatives such as PIC (used in the popular PIC-16 chips), MIPS (used in the PIC-32 range), AVR (used by most Arduinos), PowerPC (used in Automotive, Aerospace, and Defence applications), MSP430 (used in your open-day spinner), etc.
 
 # What does the compiler do?
 
 When it comes to programming we often refer to "the compiler" as a whole without going too much into details.
 Generating an executable actually comprises at least two steps. Creating object files and then linking the object files. The compiler is only responsible for creating the object files, which are a translation into machine language from our source file.
 As you all know, computers don't understand English but they do work quite well with bits and bytes.
-
 
 Once the compiler has produced the object files, we need to call the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where they come from. In the example above we can the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
 Given that we are working with a somewhat low-level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly, you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In Clang and GCC's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
@@ -169,12 +170,12 @@ int sum(int a, int b) {
 
 Pointers are, without a doubt, one of the most common sources of confusion when it comes to C programming.
 So, what is a pointer? What does it do and how do we use it?
-As the name suggests, a pointer points; What to? It points to a location, or *address*, in memory.
+As the name suggests, a pointer points; What to? It points to a location, or _address_, in memory.
 
-Why is that useful? Well, thanks to pointers, we can pass variables *by reference* rather than *by value*. It might not be immediate to you now, but this feature allows us to write code that performs efficiently and at the same time is easy to ready.
+Why is that useful? Well, thanks to pointers, we can pass variables _by reference_ rather than _by value_. It might not be immediate to you now, but this feature allows us to write code that performs efficiently and at the same time is easy to ready.
 
 How does passing by reference work? Well like I said, pointers point to a address in memory. Often, but not exclusively, that address is where a variable is stored. This means that, given we have a reference to said variable, we can access it across different **scopes** in our program (A scope could be a function, for instance) without having to make a copy.
-This means that if we define a variable in say, *main*, and then call another function, *B*, by passing a pointer to the variable we can modify (*mutate*) and read the value of the variable from within that function B. If we passed the variable by value we would only be able to see the value of the variable without being able to mutate it.
+This means that if we define a variable in say, _main_, and then call another function, _B_, by passing a pointer to the variable we can modify (_mutate_) and read the value of the variable from within that function B. If we passed the variable by value we would only be able to see the value of the variable without being able to mutate it.
 
 ## Passing by value
 
@@ -238,8 +239,8 @@ There is a lot going on there. So first of all let's learn how to recognise a po
 ```c
 int *iAmAPointer = NULL;
 ```
-iAmAPointer is going to be a pointer to an Integer value, though it currently points at the `NULL` address.
 
+iAmAPointer is going to be a pointer to an Integer value, though it currently points at the `NULL` address.
 
 But a pointer should point to something - it shouldn't be `NULL`. To get the address of a variable to give to a pointer-variable, we use the `&` symbol. Example:
 
@@ -252,9 +253,9 @@ iAmAValue = 10;
 iAmAPointer = &iAmAValue;
 ```
 
-Now we want to access the value of the variable from the pointer. To do that, we *dereference* the pointer.
+Now we want to access the value of the variable from the pointer. To do that, we _dereference_ the pointer.
 
-Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? Context. If you see a type (int, float, char, e.t.c.) right before the `*`, then we are declaring a pointer to a variable of that type. If you see `*` in front of a variable (such as `*iAmAPointer`), then we are dereferencing that variable as a pointer - and it better be a valid pointer or there'll be trouble! Example:
+Now a bit of confusion might kick in. To dereference a pointer we use the `*` symbol. Unfortunately, that is the same character we use to declare a pointer. So, how do we tell the difference? Context. If you see a type (int, float, char, etc.) right before the `*`, then we are declaring a pointer to a variable of that type. If you see `*` in front of a variable (such as `*iAmAPointer`), then we are dereferencing that variable as a pointer - and it better be a valid pointer or there'll be trouble! Example:
 
 ```c
 int iAmAValue;
@@ -279,7 +280,6 @@ iAmAPointer = &iAmAValue;
 
 iAmTheSameValue = (*iAmAValue); /* error: invalid type argument of unary ‘*’ (have ‘int’) */
 ```
-
 
 It is important to mention that a pointer is just a variable, except instead of storing a "human" value it stores another variable's memory address.
 
@@ -477,17 +477,18 @@ Generally speaking, using any of the above syntaxes is not ideal as they are inv
 
 # `malloc()` and friends (dynamic memory allocation)
 
-Everything we have done so far relies on *statically allocated* variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to shine. The main difference between *statically* and *dynamically* allocated memory (remember, variables sit in memory) is where and when the allocation happens.
+Everything we have done so far relies on _statically allocated_ variables, but a true C ninja knows how to handle their dynamic memory. Here is where pointers come to shine. The main difference between _statically_ and _dynamically_ allocated memory (remember, variables sit in memory) is where and when the allocation happens.
 
 ## Static allocation
 
-Statically allocated memory is allocated in what is called the *stack*, and it's allocated right at the beginning of your program staying allocated until your program exits. The stack is a region of memory allocated to the execution of your program. The ammount of memory available to the stack will not change throughout the execution of the program; Furthermore, once the size of the stack is determined and the memory is allocated, you will not be able to "free" the memory until the program exits. Freeing memory means making it available to other processes. Statically allocated memory is easy to use but gives you rather strict constraints.
+Statically allocated memory is allocated in what is called the _stack_, and it's allocated right at the beginning of your program staying allocated until your program exits. The stack is a region of memory allocated to the execution of your program. The ammount of memory available to the stack will not change throughout the execution of the program; Furthermore, once the size of the stack is determined and the memory is allocated, you will not be able to "free" the memory until the program exits. Freeing memory means making it available to other processes. Statically allocated memory is easy to use but gives you rather strict constraints.
 
 ## Dynamically allocated memory
 
 Dynamically allocated memory is allocated into the so-called heap, and it's allocated upon request from your program. It can be freed whenever your program says it's okay to be freed. It should be clear to you that dynamic allocation gives you incredible degrees of freedom. On the other hand, dynamic allocation is often hard to keep track of and if done incorrectly can quickly lead to memory leaks. As with most things, dynamic allocation is better but harder to use.
 
 So - how do we do this dynamic memory allocation thing?
+
 ```c
 // ./code/malloc.c
 
@@ -519,7 +520,8 @@ int main(int argc, char const *argv[])
 
 ```
 
-In the above program we used the `malloc()` function from the Standard Library to dynamically allocate enough memory to store `10 * (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `NOT_SO_DYNAMIC_LENGTH` (10, here) times the size of an integer (`sizeof(integer)`). We can do that with every type. At the end of the program, we released (or *freed*) the memory by calling the `free()` function and passing our pointer as a parameter. We used dynamic allocation but we did not really take any advantage of it, since we used a statically defined size. Let's now take advantage of dynamic allocation:
+In the above program we used the `malloc()` function from the Standard Library to dynamically allocate enough memory to store `10 * (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `NOT_SO_DYNAMIC_LENGTH` (10, here) times the size of an integer (`sizeof(integer)`). We can do that with every type. At the end of the program, we released (or _freed_) the memory by calling the `free()` function and passing our pointer as a parameter. We used dynamic allocation but we did not really take any advantage of it, since we used a statically defined size. Let's now take advantage of dynamic allocation:
+
 ```c
 // ./code/memory_operations.c
 
@@ -586,11 +588,13 @@ int bail()
     return -1; // Will "expand" to 255, return code is one byte
 }
 ```
+
 This program takes in an input string with a maximum length of `256` characters (each character is one byte) and returns a Spongebob meme style string (EvErY EvEn ChArAcThEr iS UpPeRcAsE). In this program we use a bunh of new functions.
- - `fgets` is used to receive input from the user.
- - `realloc` handles shrinking or expanding previously allocated memory (by `malloc`). It allows us to save some space as we allocate only the memory we actually need to store our string instead of the initial `256` bytes.
- - `memcpy` copies memory from one address to another. In this case we used it to duplicate our input string into a new buffer that we then modified.
- - `toupper` converts a character from lower case to uppercase. Can be done in many ways, this is easy and good enough for this example.
+
+- `fgets` is used to receive input from the user.
+- `realloc` handles shrinking or expanding previously allocated memory (by `malloc`). It allows us to save some space as we allocate only the memory we actually need to store our string instead of the initial `256` bytes.
+- `memcpy` copies memory from one address to another. In this case we used it to duplicate our input string into a new buffer that we then modified.
+- `toupper` converts a character from lower case to uppercase. Can be done in many ways, this is easy and good enough for this example.
 
 Program output:
 
