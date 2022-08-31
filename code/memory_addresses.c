@@ -1,11 +1,12 @@
 #include <stdio.h>
+#include <stdint.h>
 
 #define ARRAY_SIZE 2
 
 int main(int argc, char const *argv[])
 {
     int integers[ARRAY_SIZE];
-    u_int8_t i;
+    uint8_t i;
     int *pIntegersZero, *pIntegersOne;
 
     integers[0] = 10;

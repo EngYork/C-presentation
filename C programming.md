@@ -343,7 +343,7 @@ int main(int argc, char const *argv[])
 By analysing the program we can predict what's going to happen with our memory.
 
 ```c
-// ./code/memory_addresses.c#L1-L10
+// ./code/memory_addresses.c#L1-L11
 
 #include <stdio.h>
 #include <stdint.h>
@@ -355,7 +355,6 @@ int main(int argc, char const *argv[])
     int integers[ARRAY_SIZE];
     uint8_t i;
     int *pIntegersZero, *pIntegersOne;
-
 ```
 
 Here we can see we have four variables. On most [modern non-embedded platforms](https://www.freebsd.org/cgi/man.cgi?query=arch&manpath=FreeBSD+12-current), integers are 4 bytes wide (Remember also that one byte is made of 8 bits). Next, we have the variable `i`. You should notice something odd here. `i` is not just an integer. I used the `uint8_t` type to define our variable, which as the name suggests is 8 bits, or 1 byte, long. I used this explicitly-sized type it's because I knew its value would never need to be greater than 255 ($2^8 - 1 = 255$). Hence, we saved some space in memory. This can certainly be a useful concept for embedded systems development.
@@ -377,7 +376,7 @@ Array items are stored consequently in memory. Therefore we can tell for sure th
 The content of all those addresses before we assign a value to those variables is unknown and probably rubbish. It's rubbish because they store whatever value was in there before we execute our code. It could be nothing, or it could be anything. We don't know and it generally does not matter to us unless we try to access that memory before assigning some value. If we do that, we can't know what to expect.
 
 ```c
-// ./code/memory_addresses.c#L11-L14
+// ./code/memory_addresses.c#L12-L15
 
 integers[0] = 10;
 integers[1] = 20;
