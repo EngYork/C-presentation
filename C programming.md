@@ -397,8 +397,6 @@ As you can see, the integers are 4 bytes apart, the pointers are 8 bytes apart a
 
 # Strings
 
-So,
-
 ![](assets/strings.jpg)
 
 Or better, we treat strings differently from most programming languages. As humans, it's easy to think of a string as a collection of characters. For example, we would normally associate `"Pugs are cute"` with the idea of a string. And that would be true in programming languages like Python where we can do stuff like:
