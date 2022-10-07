@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+td {
+  @apply px-4 border-4 border-gray-900 text-center
+}

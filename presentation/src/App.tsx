@@ -6,8 +6,7 @@ import {
   Slide,
   Text,
 } from "spectacle";
-import { Hello } from "./slides";
-import { Why } from "./slides/Why";
+import { Compiling, Hello, HelloWorld, Memory, Not, Pointers, Why } from "./slides";
 
 const template: React.FC = () => {
   return (
@@ -39,6 +38,11 @@ const App: React.FC = () => {
     <Deck theme={theme} template={template}>
       <Hello />
       <Why />
+      <Not />
+      <HelloWorld />
+      <Compiling />
+      <Pointers />
+      <Memory />
     </Deck>
   );
 };
