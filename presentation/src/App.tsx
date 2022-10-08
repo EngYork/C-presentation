@@ -6,7 +6,19 @@ import {
   Slide,
   Text,
 } from "spectacle";
-import { Compiling, Hello, HelloWorld, Memory, Not, Pointers, Why } from "./slides";
+import {
+  Compiling,
+  Dynamic,
+  Hello,
+  HelloWorld,
+  Memory,
+  Not,
+  Pointers,
+  Questions,
+  Resources,
+  Strings,
+  Why,
+} from "./slides";
 
 const template: React.FC = () => {
   return (
@@ -43,6 +55,10 @@ const App: React.FC = () => {
       <Compiling />
       <Pointers />
       <Memory />
+      <Strings />
+      <Dynamic />
+      <Questions />
+      <Resources />
     </Deck>
   );
 };
