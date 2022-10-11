@@ -4,6 +4,7 @@ import {
   Heading,
   Image,
   ListItem,
+  Notes,
   Slide,
   UnorderedList,
 } from "spectacle";
@@ -167,6 +168,20 @@ const Memory: React.FC = () => {
             className="w-[800px] mx-auto my-auto"
           />
         </div>
+        <Notes>
+          As you can see, the integers are 4 bytes apart, the pointers are 8
+          bytes apart and all the sizes check out to what was speculated before.
+          The pointers point to the variables we intended them to point to. Do
+          notice that the pointers are stored subsequently as we speculated. It
+          might be trickier to catch but:
+          <ul className="my-4 mx-4 list-disc">
+            <li>pIntegersOne is stored at 0x16bb8b7c8</li>
+            <li>
+              pIntegersZero is stored at 0x16bb8b7d0 0x16bb8b7c8 is exaclty 8
+            </li>
+            <li>bytes "before" 0x16bb8b7d0 In HEX, 0xC8 + 0x08 = 0xD0</li>
+          </ul>
+        </Notes>
       </Slide>
     </>
   );
