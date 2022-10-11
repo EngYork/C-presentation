@@ -58,7 +58,9 @@ const Why: React.FC = () => {
                       imageRef.current.className =
                         "rounded-xl h-80 object-contain border-2 border-slate-700";
                       imageRef.current.src = value as string;
-                      pRef.current.innerHTML = value as string;
+                      pRef.current.innerHTML = `Image source: ${
+                        value as string
+                      }`;
                     }
                   }
                   return <></>;
@@ -67,7 +69,7 @@ const Why: React.FC = () => {
             </Appear>
           ))}
         </UnorderedList>
-        <div className="w-full h-full flex flex-col items-center">
+        <div className="w-full h-full flex flex-col items-center break-all">
           <img ref={imageRef} />
           <p ref={pRef} />
         </div>
