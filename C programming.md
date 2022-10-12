@@ -45,8 +45,8 @@ When it comes to programming we often refer to "the compiler" as a whole without
 Generating an executable actually comprises at least two steps. Creating object files and then linking the object files. The compiler is only responsible for creating the object files, which are a translation into machine language from our source file.
 As you all know, computers don't understand English but they do work quite well with bits and bytes.
 
-Once the compiler has produced the object files, we need to call the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where they come from. In the example above we can the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
-Given that we are working with a somewhat low-level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closes language to machine language. In assembly, you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In Clang and GCC's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
+Once the compiler has produced the object files, we need to call the linker. The linker, as the name says, instructs the computer about what functions need to be invoked and where they come from. In the example above we call the printf function. Although our code does not define the printf function and does not instruct the computer about what the printf function does, the program still works. That is because we included the function definition from the standard input and output library, that is stdio.h, and the linker has worked its way to reference the function call in our executable file.
+Given that we are working with a somewhat low-level language, you might want to inspect the intermediate steps that get you from your source C file to the executable binary file. A useful piece of information would come right before the assembler runs. The assembler translates assembly language into a binary executable. Assembly is the closest language to machine language. In assembly, you have to describe what you want from the processor step by step. To gather the assembly code generated from your C file, compilers often expose a flag. In Clang and GCC's case that is `-S`. So, to get the assembly translation of your source code you should run something along the lines of:
 
 `$ clang -S -o code/hello_world-arm64.asm code/hello_world.c`
 
@@ -174,7 +174,7 @@ As the name suggests, a pointer points; What to? It points to a location, or _ad
 
 Why is that useful? Well, thanks to pointers, we can pass variables _by reference_ rather than _by value_. It might not be immediate to you now, but this feature allows us to write code that performs efficiently and at the same time is easy to ready.
 
-How does passing by reference work? Well like I said, pointers point to a address in memory. Often, but not exclusively, that address is where a variable is stored. This means that, given we have a reference to said variable, we can access it across different **scopes** in our program (A scope could be a function, for instance) without having to make a copy.
+How does passing by reference work? Well like I said, pointers point to an address in memory. Often, but not exclusively, that address is where a variable is stored. This means that, given we have a reference to said variable, we can access it across different **scopes** in our program (A scope could be a function, for instance) without having to make a copy.
 This means that if we define a variable in say, _main_, and then call another function, _B_, by passing a pointer to the variable we can modify (_mutate_) and read the value of the variable from within that function B. If we passed the variable by value we would only be able to see the value of the variable without being able to mutate it.
 
 ## Passing by value
@@ -240,7 +240,7 @@ There is a lot going on there. So first of all let's learn how to recognise a po
 int *iAmAPointer = NULL;
 ```
 
-iAmAPointer is going to be a pointer to an Integer value, though it currently points at the `NULL` address.
+`iAmAPointer` is going to be a pointer to an Integer value, though it currently points at the `NULL` address.
 
 But a pointer should point to something - it shouldn't be `NULL`. To get the address of a variable to give to a pointer-variable, we use the `&` symbol. Example:
 
@@ -357,9 +357,9 @@ int main(int argc, char const *argv[])
     int *pIntegersZero, *pIntegersOne;
 ```
 
-Here we can see we have four variables. On most [modern non-embedded platforms](https://www.freebsd.org/cgi/man.cgi?query=arch&manpath=FreeBSD+12-current), integers are 4 bytes wide (Remember also that one byte is made of 8 bits). Next, we have the variable `i`. You should notice something odd here. `i` is not just an integer. I used the `uint8_t` type to define our variable, which as the name suggests is 8 bits, or 1 byte, long. I used this explicitly-sized type it's because I knew its value would never need to be greater than 255 ($2^8 - 1 = 255$). Hence, we saved some space in memory. This can certainly be a useful concept for embedded systems development.
+Here we can see we have four variables. On most [modern non-embedded platforms](https://www.freebsd.org/cgi/man.cgi?query=arch&manpath=FreeBSD+12-current), integers are 4 bytes wide (Remember also that one byte is made of 8 bits). Next, we have the variable `i`. You should notice something odd here. `i` is not just an integer. I used the `uint8_t` type to define our variable, which as the name suggests is 8 bits, or 1 byte, long and unsigned. I used this explicitly-sized type because I knew its value would never need to be greater than 255 ( $2^8 - 1 = 255$ ). Hence, we saved some space in memory (not necessarily true due to padding, but we can ignore that for now). This can certainly be a useful concept for embedded systems development.
 
-Now we have two pointers. On a 64-bit platform pointers are usually 8 bytes long (or 64 bits).
+Now we have two pointers. On a 64-bit platform, pointers are usually 8 bytes long (or 64 bits).
 
 Notice anything yet? My machine is a 64-bit ARM computer. The fact that pointers are 8 bytes long tells us that my machine can handle 64-bit address spaces. On a 32-bit Intel computer, pointers are usually 4 bytes long as they operate in 32-bit address spaces. So let's rewrite the table with our variables in mind:
 
@@ -520,7 +520,7 @@ int main(int argc, char const *argv[])
 
 ```
 
-In the above program we used the `malloc()` function from the Standard Library to dynamically allocate enough memory to store `10 * (NOT_SO_DYNAMIC_LENGTH)` integers. Integers because we specified `NOT_SO_DYNAMIC_LENGTH` (10, here) times the size of an integer (`sizeof(integer)`). We can do that with every type. At the end of the program, we released (or _freed_) the memory by calling the `free()` function and passing our pointer as a parameter. We used dynamic allocation but we did not really take any advantage of it, since we used a statically defined size. Let's now take advantage of dynamic allocation:
+In the above program we used the `malloc()` function from the Standard Library to dynamically allocate enough memory to store 10 (`NOT_SO_DYNAMIC_LENGTH`) integers. Integers because we specified `NOT_SO_DYNAMIC_LENGTH` (10, here) times the size of an integer (`sizeof(integer)`). We can do that with every type. At the end of the program, we released (or _freed_) the memory by calling the `free()` function and passing our pointer as a parameter. We used dynamic allocation but we did not really take any advantage of it, since we used a statically defined size. Let's now take advantage of dynamic allocation:
 
 ```c
 // ./code/memory_operations.c
@@ -545,7 +545,7 @@ int main(int argc, char const *argv[])
     // Memory allocation can fail! (Extremely unlikely, but always better safe than sorry)
     if (buffer != NULL)
     {
-        printf("Input a string max (%d characters): ", (BUFFER_SIZE - 1));
+        printf("Input a string (max %d characters): ", (BUFFER_SIZE - 1));
         fgets(buffer, BUFFER_SIZE, stdin);
 
         inputLength = strlen(buffer);
@@ -589,7 +589,7 @@ int bail()
 }
 ```
 
-This program takes in an input string with a maximum length of `256` characters (each character is one byte) and returns a Spongebob meme style string (EvErY EvEn ChArAcThEr iS UpPeRcAsE). In this program we use a bunh of new functions.
+This program takes in an input string with a maximum length of `256` characters (each character is one byte) and returns a Spongebob meme style string (EvErY EvEn ChArAcThEr iS UpPeRcAsE). In this program we use a bunch of new functions.
 
 - `fgets` is used to receive input from the user.
 - `realloc` handles shrinking or expanding previously allocated memory (by `malloc`). It allows us to save some space as we allocate only the memory we actually need to store our string instead of the initial `256` bytes.

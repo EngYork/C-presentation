@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
     // Memory allocation can fail! (Extremely unlikely, but always better safe than sorry)
     if (buffer != NULL)
     {
-        printf("Input a string max (%d characters): ", (BUFFER_SIZE - 1));
+        printf("Input a string (max %d characters): ", (BUFFER_SIZE - 1));
         fgets(buffer, BUFFER_SIZE, stdin);
 
         inputLength = strlen(buffer);
