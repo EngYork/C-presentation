@@ -481,11 +481,17 @@ Everything we have done so far relies on _statically allocated_ variables, but a
 
 ## Static allocation
 
-Statically allocated memory is allocated in what is called the _stack_, and it's allocated right at the beginning of your program staying allocated until your program exits. The stack is a region of memory allocated to the execution of your program. The ammount of memory available to the stack will not change throughout the execution of the program; Furthermore, once the size of the stack is determined and the memory is allocated, you will not be able to "free" the memory until the program exits. Freeing memory means making it available to other processes. Statically allocated memory is easy to use but gives you rather strict constraints.
+Variables declared within a function are usually allocated onto the _stack_. They are allocated when required by the function and deallocated when the function has fully executed. Other data that ends up on the stack are variables declared using the `static` keyword and global variables. The stack is a region of memory allocated to the execution of your program. The ammount of memory available to the stack will not change throughout the execution of the program; As a programmer, you have no control over when the memory is allocated and deallocated. Hence, you can't "free" the memory used by variables statically allocated. Freeing memory means making it available to other processes. However, that also means you don't have to worry about the problems associated with dynamic memory allocation (see below).
 
 ## Dynamically allocated memory
 
-Dynamically allocated memory is allocated into the so-called heap, and it's allocated upon request from your program. It can be freed whenever your program says it's okay to be freed. It should be clear to you that dynamic allocation gives you incredible degrees of freedom. On the other hand, dynamic allocation is often hard to keep track of and if done incorrectly can quickly lead to memory leaks. As with most things, dynamic allocation is better but harder to use.
+Dynamically allocated memory is allocated into the so-called heap, and it's allocated upon request from your program. It can be freed whenever your program says it's okay to be freed. It should be clear to you that dynamic allocation gives you incredible degrees of freedom. On the other hand, dynamic allocation is often hard to keep track of and if done incorrectly can quickly lead to memory leaks. As with most things, dynamic allocation is better but harder to use. Furthermore, functions used to dynamically allocate memory are slow (i.e. `malloc()` or `free()`). In embedded systems, you want to avoid using them if you can. As a general rule of thumb, if at compile-time you know what the size of each variable is going to be, you don't need to use dynamically allocated memory. Examples of why you would need to use dynamic allocation are pretty much any external factor you can think of:
+
+- User input
+- Data coming through a serial interface
+- You name it
+
+For example, if you need to retrieve a user's name you can't predict how many characters it's going to contain. Hence, you make your program allocate _some_ amount of memory that you will then shrink down to only what you actually need to store the required information. This is just one of the infinite scenarios in which you would use dynamic memory allocation.
 
 So - how do we do this dynamic memory allocation thing?
 
